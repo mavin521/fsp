@@ -12,6 +12,20 @@ function check_link($url) {
 }
 
 function fetch_links($channel) {
+    // 文件路径
+    $file_path = 'cached_links.txt';
+
+    // 尝试从文件中读取直播源链接
+    $cached_links = [];
+    if (file_exists($file_path)) {
+        $cached_links = json_decode(file_get_contents($file_path), true);
+    }
+
+    // 检查是否有缓存
+    if (isset($cached_links[$channel]) && time() < $cached_links[$channel]['expires']) {
+        return $cached_links[$channel]['link'];
+    }
+
     // 从新链接获取直播源链接
     $new_source_link = "https://ghproxy.net/https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u";
     $new_source_response = file_get_contents($new_source_link);
@@ -23,6 +37,12 @@ function fetch_links($channel) {
     if ($index !== false) {
         $link = trim($new_source_links[$index]);
         if (check_link($link)) {
+            // 将直播源链接写入文件
+            $cached_links[$channel] = [
+                'link' => $link,
+                'expires' => time() + 3 * 24 * 60 * 60,
+            ];
+            file_put_contents($file_path, json_encode($cached_links));
             return $link;
         }
     }
@@ -35,6 +55,12 @@ function fetch_links($channel) {
     foreach ($old_source_links as $link) {
         $link = trim($link);
         if (check_link($link)) {
+            // 将直播源链接写入文件
+            $cached_links[$channel] = [
+                'link' => $link,
+                'expires' => time() + 3 * 24 * 60 * 60,
+            ];
+            file_put_contents($file_path, json_encode($cached_links));
             return $link;
         }
     }
@@ -42,32 +68,18 @@ function fetch_links($channel) {
     return false;
 }
 
-function create_m3u_file($tv_channels, $filename = 'tv_channels.m3u') {
-    $m3uContent = "#EXTM3U\n";
-
-    foreach ($tv_channels as $channel) {
-        $channel = trim($channel);
-        $link = fetch_links($channel);
-
-        if ($link !== false) {
-            $m3uContent .= "#EXTINF:-1, {$channel}\n{$link}\n";
-        }
-    }
-
-    file_put_contents($filename, $m3uContent);
-    return $filename;
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tv_channels = explode(',', $_POST['channels']);
     $action = $_POST['action'];
 
     if ($action == 'generate_m3u') {
-        $file = create_m3u_file($tv_channels);
+        // 生成 M3U 文件
+        $filename = create_m3u_file($tv_channels);
         echo '<h2>文件生成完成，请下载：</h2>';
-        echo "<a href='{$file}' download>下载文件</a>";
+        echo "<a href='{$filename}' download>下载文件</a>";
         exit;
     } elseif ($action == 'play_directly') {
+        // 直接播放
         echo '<h2>直播源列表：</h2>';
         foreach ($tv_channels as $channel) {
             $channel = trim($channel);
