@@ -64,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($action == 'generate_m3u') {
         echo '<h2>文件生成完成，请下载：</h2>';
         echo '<p>生成 M3U 文件的功能未完全定义。</p>';
+        // 请在这里添加生成 M3U 文件的代码
         exit;
     } elseif ($action == 'play_directly') {
         echo '<h2>直播源列表：</h2>';
