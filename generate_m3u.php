@@ -68,6 +68,25 @@ function fetch_links($channel) {
     return false;
 }
 
+// 生成 M3U 文件
+function create_m3u_file($tv_channels) {
+    $m3u_content = "#EXTM3U\n";
+
+    foreach ($tv_channels as $channel) {
+        $channel = trim($channel);
+        $link = fetch_links($channel);
+
+        if ($link !== false) {
+            $m3u_content .= "#EXTINF:-1,{$channel}\n{$link}\n";
+        }
+    }
+
+    $filename = 'generated_playlist.m3u';
+    file_put_contents($filename, $m3u_content);
+
+    return $filename;
+}
+
 // 获取最近搜索的频道名称列表
 function get_recent_searches($file_path) {
     // 尝试从文件中读取最近搜索的频道名称
@@ -129,16 +148,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $other_users_recent_searches = get_recent_searches('other_users_recent_searches.txt');
 echo '<h2>其他用户最近搜索的频道：</h2>';
 echo '<ul>';
-$unique_other_users_recent_searches = array_unique($other_users_recent_searches);
-
-// 显示其他用户最近搜索的频道（最多30个，不重复）
-$counter = 0;
-foreach ($unique_other_users_recent_searches as $search) {
-    if ($counter >= 30) {
-        break;
-    }
+foreach ($other_users_recent_searches as $search) {
     echo "<li>{$search}</li>";
-    $counter++;
 }
 echo '</ul>';
 ?>
