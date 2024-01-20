@@ -71,9 +71,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (!empty($links)) {
                 $m3u_content .= "{$links[0]}\n";
                 $m3u_content .= "{$links[1]}\n";
+            } else {
+                // 将调试信息写入错误日志
+                error_log("No links found for channel: {$channel}\n", 3, "error.log");
             }
         }
 
+        // 将内容写入文件
         file_put_contents($filename, $m3u_content);
 
         echo '<h2>文件生成完成，请下载：</h2>';
@@ -91,9 +95,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo "<p>链路1：<a href='{$links[0]}' target='_blank'>{$links[0]}</a></p>";
                 echo "<p>链路2：<a href='{$links[1]}' target='_blank'>{$links[1]}</a></p>";
                 echo "</div>";
+            } else {
+                // 将调试信息写入错误日志
+                error_log("No links found for channel: {$channel}\n", 3, "error.log");
             }
         }
         exit;
     }
 }
+
+// ...（其他函数代码）
+
 ?>
