@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>电视频道直播源生成器</title>
+    <title>电视频道 M3U 文件生成器</title>
     <style>
         body {
             text-align: center;
@@ -38,17 +38,33 @@
         <label for="play_channels">生成 M3U 文件:</label>
         <select id="play_channels" name="channels">
             <?php
-                // 这里可以根据需要显示推荐的频道
+                $recent_searches = json_decode(file_get_contents('recent_searches.txt'), true);
+
+                // Display recommended channels based on popularity
+                $recommended_channels = array_count_values($recent_searches);
+                arsort($recommended_channels);
+
+                // Display up to 30 recommended channels
+                $count = 0;
+                foreach ($recommended_channels as $search => $count) {
+                    if ($count > 1) {
+                        echo "<option value='{$search}'>{$search}</option>";
+                        $count--;
+                    }
+                }
             ?>
         </select>
         <input type="hidden" name="action" value="generate_m3u">
         <input type="submit" value="生成M3U文件">
     </form>
 
-    <h2>最近热搜频道：</h2>
+    <h2>其他用户最近搜索的频道：</h2>
     <ul>
         <?php
-            // 这里可以显示其他用户最近搜索的频道
+            $other_users_recent_searches = json_decode(file_get_contents('other_users_recent_searches.txt'), true);
+            foreach ($other_users_recent_searches as $search) {
+                echo "<li>{$search}</li>";
+            }
         ?>
     </ul>
 </body>
