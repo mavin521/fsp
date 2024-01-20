@@ -5,15 +5,15 @@
     <style>
         body {
             text-align: center;
-            font-size: 20px; /* 修改字体大小 */
+            font-size: 20px;
         }
 
         form {
-            margin: 20px auto; /* 居中显示表单 */
+            margin: 20px auto;
         }
 
         h2 {
-            margin-top: 20px; /* 调整标题上边距 */
+            margin-top: 20px;
         }
 
         ul {
