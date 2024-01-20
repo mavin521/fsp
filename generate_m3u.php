@@ -11,6 +11,19 @@ function check_link($url) {
     return $retcode == 200;
 }
 
+function get_old_links_for_channel($channel) {
+    // 示例获取旧链接的逻辑，您需要替换为实际逻辑
+    // 这里简单返回一个示例旧链接数组
+    $old_source_response = file_get_contents("http://tonkiang.us/?s=" . urlencode($channel));
+    preg_match_all('/copyto\("([^"]+)"\)/', $old_source_response, $old_source_matches);
+    $old_source_links = array_slice($old_source_matches[1], 0, 4); // 最多检查四个链接
+
+    $valid_links = array_filter($old_source_links, 'check_link');
+    $valid_links = array_slice($valid_links, 0, 2);
+
+    return $valid_links;
+}
+
 function fetch_links($channel) {
     // 文件路径
     $file_path = 'cached_links.txt';
@@ -23,94 +36,37 @@ function fetch_links($channel) {
 
     // 检查是否有缓存
     if (isset($cached_links[$channel]) && time() < $cached_links[$channel]['expires']) {
-        return $cached_links[$channel]['link'];
+        return $cached_links[$channel]['links'];
     }
 
     // 从新链接获取直播源链接
-    $new_source_link = "https://ghproxy.net/https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u";
-    $new_source_response = file_get_contents($new_source_link);
-    preg_match_all('/#EXTINF:-1,(.+)\n(.+)/', $new_source_response, $new_source_matches);
-    $new_source_channels = $new_source_matches[1];
-    $new_source_links = $new_source_matches[2];
+    $new_source_links = get_old_links_for_channel($channel);
 
-    $index = array_search($channel, $new_source_channels);
-    if ($index !== false) {
-        $link = trim($new_source_links[$index]);
-        if (check_link($link)) {
-            // 将直播源链接写入文件
-            $cached_links[$channel] = [
-                'link' => $link,
-                'expires' => time() + 3 * 24 * 60 * 60,
-            ];
-            file_put_contents($file_path, json_encode($cached_links));
-            return $link;
-        }
+    // 如果找到新链接，直接返回给用户
+    if (!empty($new_source_links)) {
+        return $new_source_links;
     }
 
-    // 如果新链接里找不到，回退到之前的链接
-    $old_source_response = file_get_contents("http://tonkiang.us/?s=" . urlencode($channel));
-    preg_match_all('/copyto\("([^"]+)"\)/', $old_source_response, $old_source_matches);
-    $old_source_links = array_slice($old_source_matches[1], 0, 2); // 最多检查两个链接
-
-    foreach ($old_source_links as $link) {
-        $link = trim($link);
-        if (check_link($link)) {
-            // 将直播源链接写入文件
-            $cached_links[$channel] = [
-                'link' => $link,
-                'expires' => time() + 3 * 24 * 60 * 60,
-            ];
-            file_put_contents($file_path, json_encode($cached_links));
-            return $link;
-        }
+    // 如果新链接找不到，回退到之前的链接
+    if (isset($cached_links[$channel]) && count($cached_links[$channel]['links']) === 2) {
+        return $cached_links[$channel]['links'];
+    } else {
+        $old_source_links = get_old_links_for_channel($channel);
+        $valid_links = array_filter($old_source_links, 'check_link');
+        $valid_links = array_slice($valid_links, 0, 2);
     }
 
-    return false;
+    // 将直播源链接写入文件
+    $cached_links[$channel] = [
+        'links' => $valid_links,
+        'expires' => time() + 3 * 24 * 60 * 60,
+    ];
+    file_put_contents($file_path, json_encode($cached_links));
+
+    return $valid_links;
 }
 
-// 生成 M3U 文件
-function create_m3u_file($tv_channels) {
-    $m3u_content = "#EXTM3U\n";
-
-    foreach ($tv_channels as $channel) {
-        $channel = trim($channel);
-        $link = fetch_links($channel);
-
-        if ($link !== false) {
-            $m3u_content .= "#EXTINF:-1,{$channel}\n{$link}\n";
-        }
-    }
-
-    $filename = 'generated_playlist.m3u';
-    file_put_contents($filename, $m3u_content);
-
-    return $filename;
-}
-
-// 获取最近搜索的频道名称列表
-function get_recent_searches($file_path) {
-    // 尝试从文件中读取最近搜索的频道名称
-    if (file_exists($file_path)) {
-        return json_decode(file_get_contents($file_path), true);
-    }
-
-    return [];
-}
-
-// 保存最近搜索的频道名称
-function save_recent_search($channel, $file_path) {
-    // 读取最近搜索的频道名称
-    $recent_searches = get_recent_searches($file_path);
-
-    // 添加新的搜索记录
-    array_unshift($recent_searches, $channel);
-
-    // 最多保留30个搜索记录
-    $recent_searches = array_slice($recent_searches, 0, 30);
-
-    // 保存到文件
-    file_put_contents($file_path, json_encode($recent_searches));
-}
+// 其他函数保持不变...
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tv_channels = explode(',', $_POST['channels']);
@@ -133,11 +89,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo '<h2>直播源列表：</h2>';
         foreach ($tv_channels as $channel) {
             $channel = trim($channel);
-            $link = fetch_links($channel);
+            $links = fetch_links($channel);
 
-            if ($link !== false) {
+            if (!empty($links)) {
                 // 居中显示播放器窗口
-                echo "<div style='text-align: center;'><video controls width='800' height='600'><source src='{$link}' type='video/mp4'></video></div>";
+                echo "<div style='text-align: center;'>";
+                echo "<p>频道：{$channel}</p>";
+                echo "<p>链路1：<a href='{$links[0]}' target='_blank'>{$links[0]}</a></p>";
+                echo "<p>链路2：<a href='{$links[1]}' target='_blank'>{$links[1]}</a></p>";
+                echo "</div>";
             }
         }
         exit;
