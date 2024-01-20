@@ -68,9 +68,40 @@ function fetch_links($channel) {
     return false;
 }
 
+// 获取最近搜索的频道名称列表
+function get_recent_searches($file_path) {
+    // 尝试从文件中读取最近搜索的频道名称
+    if (file_exists($file_path)) {
+        return json_decode(file_get_contents($file_path), true);
+    }
+
+    return [];
+}
+
+// 保存最近搜索的频道名称
+function save_recent_search($channel, $file_path) {
+    // 读取最近搜索的频道名称
+    $recent_searches = get_recent_searches($file_path);
+
+    // 添加新的搜索记录
+    array_unshift($recent_searches, $channel);
+
+    // 最多保留30个搜索记录
+    $recent_searches = array_slice($recent_searches, 0, 30);
+
+    // 保存到文件
+    file_put_contents($file_path, json_encode($recent_searches));
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tv_channels = explode(',', $_POST['channels']);
     $action = $_POST['action'];
+
+    // 保存最近搜索的频道名称
+    foreach ($tv_channels as $channel) {
+        $channel = trim($channel);
+        save_recent_search($channel, 'recent_searches.txt');
+    }
 
     if ($action == 'generate_m3u') {
         // 生成 M3U 文件
@@ -93,4 +124,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 }
+
+// 显示其他用户最近搜索的频道名称
+$other_users_recent_searches = get_recent_searches('other_users_recent_searches.txt');
+echo '<h2>其他用户最近搜索的频道：</h2>';
+echo '<ul>';
+foreach ($other_users_recent_searches as $search) {
+    echo "<li>{$search}</li>";
+}
+echo '</ul>';
 ?>
