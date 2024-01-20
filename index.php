@@ -2,6 +2,29 @@
 <html>
 <head>
     <title>电视频道 M3U 文件生成器</title>
+    <style>
+        body {
+            text-align: center;
+            font-size: 20px; /* 修改字体大小 */
+        }
+
+        form {
+            margin: 20px auto; /* 居中显示表单 */
+        }
+
+        h2 {
+            margin-top: 20px; /* 调整标题上边距 */
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
     <form method="post" action="generate_m3u.php">
