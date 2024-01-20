@@ -40,18 +40,17 @@
             <?php
                 $recent_searches = json_decode(file_get_contents('recent_searches.txt'), true);
 
-                // 计算频道热度
-                $channel_counts = array_count_values($recent_searches);
-                arsort($channel_counts);
+                // Display recommended channels based on popularity
+                $recommended_channels = array_count_values($recent_searches);
+                arsort($recommended_channels);
 
-                // 显示推荐频道（最多30个）
-                $counter = 0;
-                foreach ($channel_counts as $search => $count) {
-                    if ($counter >= 30) {
-                        break;
+                // Display up to 30 recommended channels
+                $count = 0;
+                foreach ($recommended_channels as $search => $count) {
+                    if ($count > 1) {
+                        echo "<option value='{$search}'>{$search}</option>";
+                        $count--;
                     }
-                    echo "<option value='{$search}'>{$search}</option>";
-                    $counter++;
                 }
             ?>
         </select>
@@ -63,16 +62,8 @@
     <ul>
         <?php
             $other_users_recent_searches = json_decode(file_get_contents('other_users_recent_searches.txt'), true);
-            $unique_other_users_recent_searches = array_unique($other_users_recent_searches);
-
-            // 显示其他用户最近搜索的频道（最多30个，不重复）
-            $counter = 0;
-            foreach ($unique_other_users_recent_searches as $search) {
-                if ($counter >= 30) {
-                    break;
-                }
+            foreach ($other_users_recent_searches as $search) {
                 echo "<li>{$search}</li>";
-                $counter++;
             }
         ?>
     </ul>
