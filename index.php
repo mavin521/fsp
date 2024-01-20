@@ -27,14 +27,14 @@
     </style>
 </head>
 <body>
-    <form method="post" action="generate_m3u.php">
+    <form method="post" action="your_generate_m3u_php_file.php">
         <label for="channels">电视频道（用英文模式下的逗号分隔）:</label>
         <input type="text" id="channels" name="channels">
         <input type="hidden" name="action" value="play_directly">
         <input type="submit" value="直接播放">
     </form>
     
-    <form method="post" action="generate_m3u.php">
+    <form method="post" action="your_generate_m3u_php_file.php">
         <label for="play_channels">生成 M3U 文件:</label>
         <select id="play_channels" name="channels">
             <?php
