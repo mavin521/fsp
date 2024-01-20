@@ -11,26 +11,46 @@ function check_link($url) {
     return $retcode == 200;
 }
 
+function fetch_links($channel) {
+    // 从新链接获取直播源链接
+    $new_source_link = "https://ghproxy.net/https://raw.githubusercontent.com/YueChan/Live/main/IPTV.m3u";
+    $new_source_response = file_get_contents($new_source_link);
+    preg_match_all('/#EXTINF:-1,(.+)\n(.+)/', $new_source_response, $new_source_matches);
+    $new_source_channels = $new_source_matches[1];
+    $new_source_links = $new_source_matches[2];
+
+    $index = array_search($channel, $new_source_channels);
+    if ($index !== false) {
+        $link = trim($new_source_links[$index]);
+        if (check_link($link)) {
+            return $link;
+        }
+    }
+
+    // 如果新链接里找不到，回退到之前的链接
+    $old_source_response = file_get_contents("http://tonkiang.us/?s=" . urlencode($channel));
+    preg_match_all('/copyto\("([^"]+)"\)/', $old_source_response, $old_source_matches);
+    $old_source_links = array_slice($old_source_matches[1], 0, 2); // 最多检查两个链接
+
+    foreach ($old_source_links as $link) {
+        $link = trim($link);
+        if (check_link($link)) {
+            return $link;
+        }
+    }
+
+    return false;
+}
+
 function create_m3u_file($tv_channels, $filename = 'tv_channels.m3u') {
     $m3uContent = "#EXTM3U\n";
 
     foreach ($tv_channels as $channel) {
         $channel = trim($channel);
-        $response = file_get_contents("http://tonkiang.us/?s=" . urlencode($channel));
-        preg_match_all('/copyto\("([^"]+)"\)/', $response, $matches);
-        $links = array_slice($matches[1], 0, 3);
+        $link = fetch_links($channel);
 
-        $valid_link_found = false;
-        foreach ($links as $link) {
-            if (check_link($link)) {
-                $m3uContent .= "#EXTINF:-1, {$channel}\n{$link}\n";
-                $valid_link_found = true;
-                break;
-            }
-        }
-
-        if (!$valid_link_found && count($links) > 0) {
-            $m3uContent .= "#EXTINF:-1, {$channel}\n{$links[0]}\n";
+        if ($link !== false) {
+            $m3uContent .= "#EXTINF:-1, {$channel}\n{$link}\n";
         }
     }
 
@@ -43,35 +63,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $action = $_POST['action'];
 
     if ($action == 'generate_m3u') {
-        // 生成M3U文件
         $file = create_m3u_file($tv_channels);
-        
-        // 提示文件生成完成
         echo '<h2>文件生成完成，请下载：</h2>';
         echo "<a href='{$file}' download>下载文件</a>";
         exit;
     } elseif ($action == 'play_directly') {
-        // 直接播放
         echo '<h2>直播源列表：</h2>';
         foreach ($tv_channels as $channel) {
             $channel = trim($channel);
-            $response = file_get_contents("http://tonkiang.us/?s=" . urlencode($channel));
-            preg_match_all('/copyto\("([^"]+)"\)/', $response, $matches);
-            $links = array_slice($matches[1], 0, 3);
+            $link = fetch_links($channel);
 
-            $valid_link_found = false;
-            foreach ($links as $link) {
-                if (check_link($link)) {
-                    // 输出直播源
-                    echo "<video controls width='800' height='600'><source src='{$link}' type='video/mp4'></video>";
-                    $valid_link_found = true;
-                    break;
-                }
-            }
-
-            if (!$valid_link_found && count($links) > 0) {
-                // 输出第一个链接
-                echo "<video controls width='800' height='600'><source src='{$links[0]}' type='video/mp4'></video>";
+            if ($link !== false) {
+                // 居中显示播放器窗口
+                echo "<div style='text-align: center;'><video controls width='800' height='600'><source src='{$link}' type='video/mp4'></video></div>";
             }
         }
         exit;
