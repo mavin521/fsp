@@ -126,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // 显示其他用户最近搜索的频道名称
-$other_users_recent_searches = get_recent_searches('other_users_recent_searches.txt');
+$other_users_recent_searches = get_recent_searches('recent_searches.txt');
 echo '<h2>其他用户最近搜索的频道：</h2>';
 echo '<ul>';
 foreach ($other_users_recent_searches as $search) {
