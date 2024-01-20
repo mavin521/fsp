@@ -105,19 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($action == 'generate_m3u') {
         // 生成 M3U 文件
-        $m3u_content = "#EXTM3U\n";
-        foreach ($tv_channels as $channel) {
-            $channel = trim($channel);
-            $link = fetch_links($channel);
-
-            if ($link !== false) {
-                $m3u_content .= "#EXTINF:-1,$channel\n$link\n";
-            }
-        }
-
-        $filename = 'generated_playlist.m3u';
-        file_put_contents($filename, $m3u_content);
-
+        $filename = create_m3u_file($tv_channels);
         echo '<h2>文件生成完成，请下载：</h2>';
         echo "<a href='{$filename}' download>下载文件</a>";
         exit;
@@ -141,8 +129,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $other_users_recent_searches = get_recent_searches('other_users_recent_searches.txt');
 echo '<h2>其他用户最近搜索的频道：</h2>';
 echo '<ul>';
-foreach ($other_users_recent_searches as $search) {
+$unique_other_users_recent_searches = array_unique($other_users_recent_searches);
+
+// 显示其他用户最近搜索的频道（最多30个，不重复）
+$counter = 0;
+foreach ($unique_other_users_recent_searches as $search) {
+    if ($counter >= 30) {
+        break;
+    }
     echo "<li>{$search}</li>";
+    $counter++;
 }
 echo '</ul>';
 ?>
