@@ -105,7 +105,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($action == 'generate_m3u') {
         // 生成 M3U 文件
-        $filename = create_m3u_file($tv_channels);
+        $m3u_content = "#EXTM3U\n";
+        foreach ($tv_channels as $channel) {
+            $channel = trim($channel);
+            $link = fetch_links($channel);
+
+            if ($link !== false) {
+                $m3u_content .= "#EXTINF:-1,$channel\n$link\n";
+            }
+        }
+
+        $filename = 'generated_playlist.m3u';
+        file_put_contents($filename, $m3u_content);
+
         echo '<h2>文件生成完成，请下载：</h2>';
         echo "<a href='{$filename}' download>下载文件</a>";
         exit;
