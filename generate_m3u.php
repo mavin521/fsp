@@ -64,7 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($action == 'generate_m3u') {
         $filename = 'playlist.m3u';
 
-        // 生成 M3U 文件的内容
         $m3u_content = "#EXTM3U\n";
         foreach ($tv_channels as $channel) {
             $m3u_content .= "#EXTINF:-1,{$channel}\n";
@@ -75,7 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        // 将内容写入文件
         file_put_contents($filename, $m3u_content);
 
         echo '<h2>文件生成完成，请下载：</h2>';
@@ -98,6 +96,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 }
-
-// ...（其他函数代码）
 ?>
