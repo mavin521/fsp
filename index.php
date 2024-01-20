@@ -5,15 +5,15 @@
     <style>
         body {
             text-align: center;
-            font-size: 20px;
+            font-size: 20px; /* 修改字体大小 */
         }
 
         form {
-            margin: 20px auto;
+            margin: 20px auto; /* 居中显示表单 */
         }
 
         h2 {
-            margin-top: 20px;
+            margin-top: 20px; /* 调整标题上边距 */
         }
 
         ul {
@@ -27,37 +27,26 @@
     </style>
 </head>
 <body>
-    <form method="post" action="generate_live.php">
+    <form method="post" action="generate_m3u.php">
         <label for="channels">电视频道（用英文模式下的逗号分隔）:</label>
         <input type="text" id="channels" name="channels">
         <input type="hidden" name="action" value="play_directly">
         <input type="submit" value="直接播放">
     </form>
     
-    <form method="post" action="generate_live.php">
+    <form method="post" action="generate_m3u.php">
         <label for="play_channels">生成 M3U 文件:</label>
         <select id="play_channels" name="channels">
             <?php
                 $recent_searches = json_decode(file_get_contents('recent_searches.txt'), true);
-
-                // Display recommended channels based on popularity
-                $recommended_channels = array_count_values($recent_searches);
-                arsort($recommended_channels);
-
-                // Display up to 30 recommended channels
-                $count = 0;
-                foreach ($recommended_channels as $search => $count) {
-                    if ($count > 1) {
-                        echo "<option value='{$search}'>{$search}</option>";
-                        $count--;
-                    }
+                foreach ($recent_searches as $search) {
+                    echo "<option value='{$search}'>{$search}</option>";
                 }
             ?>
         </select>
         <input type="hidden" name="action" value="generate_m3u">
         <input type="submit" value="生成M3U文件">
     </form>
-
     <h2>其他用户最近搜索的频道：</h2>
     <ul>
         <?php
