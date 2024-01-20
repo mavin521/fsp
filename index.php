@@ -40,11 +40,9 @@
             <?php
                 $recent_searches = json_decode(file_get_contents('recent_searches.txt'), true);
 
-                // Display recommended channels based on popularity
                 $recommended_channels = array_count_values($recent_searches);
                 arsort($recommended_channels);
 
-                // Display up to 30 recommended channels
                 $count = 0;
                 foreach ($recommended_channels as $search => $count) {
                     if ($count > 1) {
