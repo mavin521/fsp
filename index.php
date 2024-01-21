@@ -19,6 +19,12 @@
         p {
             margin: 10px 0;
         }
+
+        .tv-channel {
+            cursor: pointer;
+            text-decoration: underline;
+            color: blue;
+        }
     </style>
 </head>
 <body>
@@ -86,32 +92,40 @@
         file_put_contents($file_path, json_encode($recent_searches));
     }
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $tv_channels = explode(',', $_POST['channels']);
-        $action = $_POST['action'];
+    // 预设的著名电视台名称数组
+    $famous_channels = [
+        'CCTV1', 'CCTV2', 'CCTV3', 'CCTV4', 'CCTV5', 'CCTV6', 'CCTV7', 'CCTV8', 'CCTV9', 'CCTV10',
+        '北京卫视', '上海卫视', '广东卫视', '江苏卫视', '浙江卫视', '湖南卫视', '安徽卫视', '东方卫视', '黑龙江卫视', '辽宁卫视',
+        '山东卫视', '河南卫视', '湖北卫视', '重庆卫视', '四川卫视', '云南卫视', '陕西卫视', '甘肃卫视', '青海卫视', '宁夏卫视',
+        '新疆卫视', '内蒙古卫视', '西藏卫视', '南方卫视', '南海卫视', '凤凰卫视', '卫视影院', '卫视中文台', '卫视欢腾HD', '卫视高清台',
+        '香港电视台', '澳门电视台', '台湾中视', '台湾民视', '台湾公视', '东森电视', '华视', '中天新闻', '中天娱乐', '中天综合',
+        'BBC News', 'CNN', 'ESPN', 'National Geographic', 'Discovery Channel', 'HBO', 'FOX', 'ABC', 'CBS', 'NBC',
+        'MTV', 'Disney Channel', 'CNBC', 'Bloomberg', 'Al Jazeera English', 'Eurosport', 'France 24', 'DW', 'NHK World', 'KBS World',
+        '中央台', '卫视台', '港澳台', '欧美电视台', '大陆港澳台中文',
+        // 添加更多电视台名称
+    ];
 
-        foreach ($tv_channels as $channel) {
-            $channel = trim($channel);
-            save_recent_search($channel, 'recent_searches.txt');
-        }
-
-        if ($action == 'play_directly') {
-            echo '<h2>直播源列表：</h2>';
-            foreach ($tv_channels as $channel) {
-                $channel = trim($channel);
-                $links = fetch_links($channel);
-                if (!empty($links)) {
-                    echo '<p>选择播放直播源：</p>';
-                    foreach ($links as $index => $link) {
-                        echo "<p><a href='{$link}' target='_blank'>直播源 " . ($index + 1) . "</a></p>";
-                    }
-                } else {
-                    echo "<p>未找到频道 '{$channel}' 的直播源。</p>";
-                }
-            }
-            exit;
-        }
+    echo '<h2>著名电视台：</h2>';
+    echo '<p>点击电视频道名称查看直播源：</p>';
+    
+    foreach ($famous_channels as $famous_channel) {
+        echo "<p class='tv-channel' onclick='fetchAndDisplay(\"$famous_channel\")'>$famous_channel</p>";
     }
     ?>
+
+    <script>
+        function fetchAndDisplay(channel) {
+            // 发送异步请求，获取直播源链接并显示
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    document.body.innerHTML += xhr.responseText;
+                }
+            };
+            xhr.open("POST", "", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("channels=" + encodeURIComponent(channel) + "&action=play_directly");
+        }
+    </script>
 </body>
 </html>
