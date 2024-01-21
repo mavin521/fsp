@@ -15,15 +15,6 @@
         h2 {
             margin-top: 20px; /* 调整标题上边距 */
         }
-
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        li {
-            margin: 5px 0;
-        }
     </style>
 </head>
 <body>
@@ -34,19 +25,6 @@
         <input type="submit" value="直接播放">
     </form>
     
-    <form method="post" action="generate_m3u.php">
-        <label for="play_channels">生成 M3U 文件:</label>
-        <select id="play_channels" name="channels">
-            <?php
-                $recent_searches = json_decode(file_get_contents('recent_searches.txt'), true);
-                foreach ($recent_searches as $search) {
-                    echo "<option value='{$search}'>{$search}</option>";
-                }
-            ?>
-        </select>
-        <input type="hidden" name="action" value="generate_m3u">
-        <input type="submit" value="生成M3U文件">
-    </form>
     <h2>其他用户最近搜索的频道：</h2>
     <ul>
         <?php
@@ -58,3 +36,4 @@
     </ul>
 </body>
 </html>
+
