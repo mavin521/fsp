@@ -23,40 +23,50 @@ if (!file_exists($cacheFile) || (time() - filemtime($cacheFile) > $cacheTime)) {
 // 假设每行是一个频道或类别标记
 $lines = explode("\n", $content);
 
+// CSS样式
+echo "<style>
+.genre {
+    margin-top: 20px;
+}
+.genre-title {
+    font-size: 24px;
+}
+.channels {
+    display: flex;
+    flex-wrap: wrap;
+}
+.channel {
+    margin: 5px;
+    padding: 10px;
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: calc(25% - 10px); /* Adjust the width for more or less columns */
+    text-align: center;
+}
+.channel a {
+    text-decoration: none;
+    color: #333;
+}
+</style>";
+
 $currentGenre = "";
-echo "<div style='margin-bottom: 20px;'>";
 foreach ($lines as $line) {
     if (strpos($line, ',#genre#') !== false) {
         // 这是一个新的类别
         if ($currentGenre != "") {
-            echo "</table>";
+            echo "</div>"; // 结束上一个类别的channels div
         }
         $currentGenre = str_replace(',#genre#', '', $line);
-        echo "<h2>$currentGenre</h2>";
-        echo "<table>"; // 开始一个新的表格
+        echo "<div class='genre'><h2 class='genre-title'>$currentGenre</h2>";
+        echo "<div class='channels'>"; // 开始一个新的channels div
     } else {
         // 分割频道名和链接
         list($channelName, $channelLink) = explode(',', $line, 2);
 
-        // 显示频道名，点击后通过video标签播放
-        // 用表格的行和单元格来组织内容
-        echo "<tr><td><a href=\"#\" onclick=\"playVideo('$channelLink'); return false;\">$channelName</a></td></tr>";
+        // 显示频道名，点击后在新标签页中打开视频播放
+        echo "<div class='channel'><a href='$channelLink' target='_blank'>$channelName</a></div>";
     }
 }
-echo "</table></div>";
-
-// 一个video标签用于播放视频
-echo "<video id='player' width='640' height='480' controls style='display:none;'></video>";
-
-echo "<script>
-function playVideo(src) {
-    var player = document.getElementById('player');
-    player.style.display = 'block';
-    player.src = src;
-    player.play();
-    player.onerror = function() {
-        alert('无法播放: ' + src);
-    };
-}
-</script>";
+echo "</div></div>"; // 结束最后一个类别的channels div和genre div
 ?>
