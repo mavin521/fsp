@@ -111,6 +111,7 @@
                     echo "<p>未找到频道 '{$channel}' 的直播源。</p>";
                 }
             }
+
             exit;
         }
     }
@@ -144,6 +145,10 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     document.write(xhr.responseText);
+                    
+                    // 修改页面 URL，记录当前状态
+                    var newUrl = window.location.href + '?channel=' + encodeURIComponent(channel);
+                    window.history.pushState({ path: newUrl }, '', newUrl);
                 }
             };
             xhr.open("POST", "", true);
