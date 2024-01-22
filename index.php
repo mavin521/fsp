@@ -5,7 +5,7 @@
     <style>
         body {
             text-align: center;
-            font-size: 20px;
+            font-size: 24px;
         }
 
         form {
@@ -20,6 +20,21 @@
             margin: 10px 0;
             display: inline-block;
             margin-right: 10px;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 80%;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
         }
     </style>
 </head>
@@ -99,18 +114,24 @@
 
         if ($action == 'play_directly') {
             echo '<h2>直播源列表：</h2>';
+            echo '<table>';
             foreach ($tv_channels as $channel) {
                 $channel = trim($channel);
                 $links = fetch_links($channel);
                 if (!empty($links)) {
-                    echo '<p>选择播放直播源：</p>';
+                    echo '<tr>';
+                    echo '<td colspan="6">选择播放直播源：</td>';
+                    echo '</tr>';
+                    echo '<tr>';
                     foreach ($links as $index => $link) {
-                        echo "<p><a href='{$link}' target='_blank'>直播源 " . ($index + 1) . "</a></p>";
+                        echo "<td><a href='{$link}' target='_blank'>直播源 " . ($index + 1) . "</a></td>";
                     }
+                    echo '</tr>';
                 } else {
-                    echo "<p>未找到频道 '{$channel}' 的直播源。</p>";
+                    echo "<tr><td colspan='6'>未找到频道 '{$channel}' 的直播源。</td></tr>";
                 }
             }
+            echo '</table>';
 
             exit;
         }
@@ -121,12 +142,23 @@
 
     $unique_channels = array_unique($famous_channels);
     echo '<h2>预设电视台：</h2>';
+    echo '<table>';
     
+    $rowCount = 0;
     foreach ($unique_channels as $famous_channel) {
-        echo "<p class='tv-channel' onclick='fetchAndDisplay(\"$famous_channel\")'>$famous_channel</p>";
+        if ($rowCount % 6 == 0) {
+            echo '<tr>';
+        }
+        echo "<td class='tv-channel' onclick='fetchAndDisplay(\"$famous_channel\")'>$famous_channel</td>";
+        $rowCount++;
+        if ($rowCount % 6 == 0) {
+            echo '</tr>';
+        }
     }
-    ?>
 
+    echo '</table>';
+    ?>
+    
     <script>
         function fetchAndDisplay(channel) {
             // 发送异步请求，获取直播源链接并直接输出到页面
