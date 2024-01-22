@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>电视频道直播</title>
+    <title>电视直播</title>
     <style>
         body {
             text-align: center;
@@ -25,7 +25,7 @@
 </head>
 <body>
     <form method="post" action="">
-        <label for="channels">电视频道（用英文逗号分隔）：</label>
+        <label for="channels">输入电视频道名称：</label>
         <input type="text" id="channels" name="channels">
         <input type="hidden" name="action" value="play_directly">
         <input type="submit" value="直接播放">
