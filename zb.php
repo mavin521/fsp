@@ -1,6 +1,6 @@
 <?php
 // 缓存文件路径
-$cacheFile = 'cached_channels.txt'; // 请确保这个路径是可写的
+$cacheFile = 'cachedchannels.txt'; // 请确保这个路径是可写的
 
 // 缓存时间设置为24小时 (24 * 60 * 60秒)
 $cacheTime = 24 * 60 * 60;
