@@ -36,6 +36,13 @@
             padding: 15px;
             text-align: center;
         }
+
+        .refresh-prompt {
+            margin-top: 20px;
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -133,6 +140,9 @@
             }
             echo '</table>';
 
+            // 在5个直播源的下一行添加提示信息
+            echo '<div class="refresh-prompt" onclick="returnToHomePage()">刷新页面返回主页</div>';
+
             exit;
         }
     }
@@ -175,6 +185,11 @@
             xhr.open("POST", "", true);
             xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhr.send("channels=" + encodeURIComponent(channel) + "&action=play_directly");
+        }
+
+        // 新增函数，点击提示信息返回主页
+        function returnToHomePage() {
+            window.location.href = 'index.php';  // 请替换为你的主页文件名
         }
     </script>
 </body>
