@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>直播链接播放页面</title>
-    <!-- 引入Chromecast SDK -->
+    <!-- 引入Google Cast SDK -->
     <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
 </head>
 <body>
@@ -12,14 +12,14 @@
     <label for="liveUrlInput">输入直播链接：</label>
     <input type="text" id="liveUrlInput" placeholder="输入m3u8格式的直播链接">
 
-    <!-- 播放器和投屏按钮 -->
+    <!-- 播放器和按钮 -->
     <div>
         <video id="liveVideo" controls></video>
         <button id="playButton">播放</button>
         <button id="castButton">投屏</button>
     </div>
 
-    <!-- 播放和投屏代码 -->
+    <!-- 脚本代码 -->
     <script>
         document.getElementById('playButton').addEventListener('click', function() {
             var liveStreamUrl = document.getElementById('liveUrlInput').value;
