@@ -15,11 +15,23 @@
     <!-- 播放器和投屏按钮 -->
     <div>
         <video id="liveVideo" controls></video>
+        <button id="playButton">播放</button>
         <button id="castButton">投屏</button>
     </div>
 
     <!-- 播放和投屏代码 -->
     <script>
+        document.getElementById('playButton').addEventListener('click', function() {
+            var liveStreamUrl = document.getElementById('liveUrlInput').value;
+            var videoElement = document.getElementById('liveVideo');
+
+            // 设置直播链接
+            videoElement.src = liveStreamUrl;
+
+            // 开始播放
+            videoElement.play();
+        });
+
         document.getElementById('castButton').addEventListener('click', function() {
             var liveStreamUrl = document.getElementById('liveUrlInput').value;
             var videoElement = document.getElementById('liveVideo');
