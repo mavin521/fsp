@@ -6,8 +6,7 @@ $cacheFile = 'cached_channels.txt'; // 请确保这个路径是可写的
 $cacheTime = 24 * 60 * 60;
 
 $urls = [
-    'https://xhdwc.tk/tvlive.txt',
-    'http://home.jundie.top:81/Cat/tv/live.txt',
+    'https://raw.githubusercontent.com/fenxp/iptv/main/live/tvlive.txt',
     'https://fongmi.cachefly.net/YuanHsing/YouTube_to_m3u/main/youtube.m3u'
 ];
 
