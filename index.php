@@ -84,12 +84,14 @@
 
         foreach ($new_source_links as $link) {
             $link = trim($link);
-            $links[] = $link;
+            if (check_link($link)) {
+                $links[] = $link;
+            }
         }
 
         $cached_links[$channel] = [
             'link' => $links,
-            'expires' => time() + 3 * 24 * 60 * 60,
+            'expires' => strtotime('tomorrow 03:00:00'),
         ];
         file_put_contents($file_path, json_encode($cached_links));
 
