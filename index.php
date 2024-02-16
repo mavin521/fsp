@@ -77,7 +77,7 @@
             return $cached_links[$channel]['link'];
         }
 
-        $new_source_response = file_get_contents("http://tonkiang.us/?s=" . urlencode($channel));
+        $new_source_response = file_get_contents("http://xxxxxx.xx/?s=" . urlencode($channel));
         preg_match_all('/copyto\("([^"]+)"\)/', $new_source_response, $new_source_matches);
         $new_source_links = array_slice($new_source_matches[1], 0, 5);
         $links = [];
