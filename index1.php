@@ -8,7 +8,7 @@ $cacheTime = 24 * 60 * 60;
 // 检查缓存文件是否存在及是否过期
 if (!file_exists($cacheFile) || (time() - filemtime($cacheFile) > $cacheTime)) {
     // 您的链接地址
-    $url = 'https://raw.githubusercontent.com/fenxp/iptv/main/live/tvlive.txt';
+    $url = 'https://ghproxy.net/https://raw.githubusercontent.com/fenxp/iptv/main/live/tvlive.txt';
 
     // 下载内容
     $content = file_get_contents($url);
